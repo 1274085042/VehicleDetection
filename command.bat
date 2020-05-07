@@ -1,0 +1,1 @@
+python train_ssd_network.py     --train_model_dir=.\ckpt\fine_tuning\     --dataset_dir=.\Images\tfrecords\     —dataset_name="vehicle"    --train_or_test=train     --model_name=ssd_vgg_300     --pre_trained_path=.\ckpt\pre_trained\ssd_300_vgg.ckpt    --weight_decay=0.0005     --optimizer=adam     --learning_rate=0.001     --batch_size=8
