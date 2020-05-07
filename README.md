@@ -495,6 +495,7 @@ python train_ssd_network.py     --train_model_dir=${TRAIN_MODEL_DIR}     --datas
   * 调整超出图片的bbox
   * 使用nms去除冗余检测
 * 预测结果显示（matplotlib）
+  ![][image19]
 
 
 [//]:#(imagereference)
@@ -516,3 +517,4 @@ python train_ssd_network.py     --train_model_dir=${TRAIN_MODEL_DIR}     --datas
 [image16]:./example/16.png
 [image17]:./example/17.png
 [image18]:./example/18.png
+[image19]:./example/19.png
