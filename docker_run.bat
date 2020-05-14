@@ -1,0 +1,1 @@
+docker run -p 8500:8500 -p 8501:8501  --mount type=bind,source=D:\Vehicle_detection\Vehicle-detection\test\model\vehicle,target=/models/vehicle/ -e MODEL_NAME=vehicle -t tensorflow/serving

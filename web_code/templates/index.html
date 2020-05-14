@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品检测</title>
+    <style>
+        .center {text-align: center}
+    </style>
+</head>
+<body class="center">
+    <script src="/static/jquery-3.3.1.min.js"></script>
+    <script src="/static/jquery.form.min.js"></script>
+    <h1>商品检测</h1>
+    <p>来，上传一张图片让我见识见识！</p>
+    <form enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+        <p><input type="file" accept=".jpg,.jpeg,.png" name="image" id="image"/></p>
+        <p><input type="submit" value="提交" id="btn" style="font-size: large"></p>
+    </form>
+    <p id="note" style="display: none;">哈哈哈，我正在看，你等下...</p>
+    <img id="resultImage">
+    <script type="text/javascript">
+        $("#uploadForm").submit(function(e){
+            e.preventDefault();
+            $("#btn").attr("disabled", true);
+            $("#resultImage").hide();
+            $(this).ajaxSubmit({
+                url:  "/api/v1/prediction/commodity",
+                type: "POST",
+                xhr:function(){
+                    var xhr = new XMLHttpRequest();
+                    xhr.responseType= 'blob';
+                    return xhr;
+                },
+                success: function(response){
+                    var objectURL = window.URL.createObjectURL(response);
+                    $("#resultImage").onload = function(){
+                        window.URL.revokeObjectURL($(this).attr("src"));
+                    };
+                    $("#resultImage").attr("src", objectURL);
+                    $("#note").hide();
+                    $("#resultImage").show();
+                    $("#btn").removeAttr("disabled");
+
+                },
+                error: function(){
+                  alert("唉呀，有问题...");
+                  $("#note").hide();
+                  $("#btn").removeAttr("disabled");
+                }
+            });
+            alert("OK! 让我瞧瞧...");
+            $("#note").show();
+        })
+    </script>
+</body>
+</html>

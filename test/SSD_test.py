@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import numpy as np
 import tensorflow as tf
 from PIL import Image
@@ -6,8 +9,8 @@ import matplotlib.image as mpimg
 import visualization
 from utils.basic_tools import np_methods
 
-# import sys
-# sys.path.append('../')
+import sys
+sys.path.append('../')
 
 slim = tf.contrib.slim
 

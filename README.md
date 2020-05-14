@@ -4,7 +4,7 @@
 * [2 模型接口](#2-模型接口 ) 
   * [2.1 文件结构](#2.1-文件结构) 
 * [3 数据预处理模块](#3-数据预处理模块)  
-  * [3.1 代码结构](3.1-代码结构)
+  * [3.1 代码结构](#3.1-代码结构)
   * [3.2 预处理需求](#3.2-预处理需求)  
   * [3.3 数据增强](#3.3-数据增强 )    
     * [3.3.1 数据增强类别](#3.3.1-数据增强类别)
@@ -32,9 +32,10 @@
 * [7 测试](#7-测试)
   * [7.1 文件结构](#7.1-文件结构)
   * [7.2 测试流程](#7.2-测试流程)
+* [8 命令行调用模型](#8-命令行调用模型)
 
 
-# 车辆检测
+# SSD-VGG车辆检测
 ![][image1]
 * ckpt：微调、初始模型目录
 * datasets：数据读取模块 
@@ -497,6 +498,64 @@ python train_ssd_network.py     --train_model_dir=${TRAIN_MODEL_DIR}     --datas
 * 预测结果显示（matplotlib）
   ![][image19]
 
+## 8 命令行调用模型
+![][image20]  
+
+**`python detector.py --ckpt_path=..\ckpt\fine_tuning\model.ckpt-0 --image_path=test_img\2.jpg`**
+
+## 9 部署
+### 9.1 部署流程
+![][image21]
+### 9.2 导出模型
+#### 9.2.1 接口介绍
+导出模型需要用到TensorFlow的SavedModelBuilder模块。使用简介如下  
+```
+    # 建立builder
+    builder = tf.saved_model.builder.SavedModelBuilder(export_path)
+    # 建立元图格式，写入文件
+    builder.add_meta_graph_and_variables(
+        sess, [tf.saved_model.tag_constants.SERVING],
+        signature_def_map={
+            'detected_model':
+            prediction_signature,
+        },
+        main_op=tf.tables_initializer(),
+        strip_default_attrs=True)
+
+    # 保存
+    builder.save()
+```
+* SavedModelBuilder()
+  * export_path 是导出目录的路径。如果目录不存在，将创建该目录。
+  * FLAGS.model_version指定模型的版本，一般以数字的字符串类型指定，如1，2，3
+* SavedModelBuilder.add_meta_graph_and_variables()：将元图和变量添加到构建器
+  * sess：TensorFlow会话
+  * tags： 保存元图的标记集，默认使用tf.saved_model.tag_constants.SERVING，参考该文件：https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/saved_model/tag_constants.py
+  * signature_def_map：指定一个tensorflow::SignatureDef的签名映射，是一套协议，能够提供给TensorFlow ServingAPI使用
+    * 键：可以取自定义别名
+    *  prediction_signature = tf.saved_model.signature_def_utils.build_signature_def()
+       *  inputs={'images': tensor_info_x} 指定输入
+       *  outputs={'scores': tensor_info_y} 指定输出  
+         使用 tf.saved_model.utils.build_tensor_info(tensor)
+       * method_name:参考：https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/saved_model/signature_constants.py  
+      使用tf.saved_model.signature_constants.PREDICT_METHOD_NAME
+    
+  * strip_default_attrs：True,保证向前兼容
+
+#### 9.2.2 代码逻辑
+* SSD的输入、输出
+  * `img_input = tf.placeholder(tf.float32, shape=(300, 300, 3))`
+  * `predictions, localisations, _, _ = ssd_net.net(img_4d, is_training=False)`
+* 加载最新的ckpt
+* 建立`builder=tf.saved_model.builder.SavedModelBuilder(export_path)`
+* 添加元图和变量`builder.add_meta_graph_and_variables()`
+
+### 9.3 安装TensorFlow Serving并开启服务
+安装:
+`docker pull tensorflow/serving`  
+
+使用Docker运行容器并开启Serving服务：
+`docker_run.bat`
 
 [//]:#(imagereference)
 [image1]:./example/1.png
@@ -517,4 +576,6 @@ python train_ssd_network.py     --train_model_dir=${TRAIN_MODEL_DIR}     --datas
 [image16]:./example/16.png
 [image17]:./example/17.png
 [image18]:./example/18.png
-[image19]:./example/19.png
+[image19]:./example/19.png  
+[image20]:./example/20.png
+[image21]:./example/21.png
