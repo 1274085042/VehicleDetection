@@ -3,7 +3,7 @@ matplotlib==2.2.2
 numpy==1.14.2
 pandas==0.20.3
 Pillow>=7.1.0
-tensorflow==1.15.4
+tensorflow==2.4.0
 flask==1.0.2
 gunicorn==19.7.1
 tensorflow-serving-api==1.15.0
